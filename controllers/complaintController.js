@@ -168,10 +168,44 @@ const deleteComplaint = async (req, res) => {
   }
 };
 
+const trackComplaint = async (req, res) => {
+  try {
+    const { complaintId } = req.params;
+    
+    // Find complaint by its readable ID (e.g., TVK-2026-00001)
+    const complaint = await Complaint.findOne({ 
+      complaintId: new RegExp(`^${complaintId}$`, 'i'), 
+      deletedAt: { $exists: false } 
+    });
+    
+    if (!complaint) {
+      return res.status(404).json({ success: false, message: 'Complaint not found' });
+    }
+
+    // Return the data mapped to exactly what ComplaintStatus.jsx expects
+    res.json({
+      success: true,
+      data: {
+        ticketId: complaint.complaintId,
+        name: complaint.name,
+        createdAt: complaint.createdAt,
+        subject: [complaint.category],
+        address: complaint.address,
+        status: complaint.status.toLowerCase().replace(' ', ''),
+        details: complaint.description
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
 module.exports = {
   createComplaint,
   getComplaints,
   getComplaintById,
   updateComplaintStatus,
-  deleteComplaint
+  deleteComplaint,
+  trackComplaint
 };

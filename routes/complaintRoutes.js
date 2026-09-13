@@ -1,5 +1,5 @@
 const express = require('express');
-const { createComplaint, getComplaints, getComplaintById, updateComplaintStatus, deleteComplaint } = require('../controllers/complaintController');
+const { createComplaint, getComplaints, getComplaintById, updateComplaintStatus, deleteComplaint, trackComplaint } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -30,6 +30,26 @@ const router = express.Router();
  *         description: Complaint submitted
  */
 router.post('/complaints', createComplaint);
+
+// Public Route for Tracking
+/**
+ * @swagger
+ * /api/complaints/ticket/{complaintId}:
+ *   get:
+ *     summary: Track complaint status by ID
+ *     tags: [Complaints Public]
+ *     parameters:
+ *       - in: path
+ *         name: complaintId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Complaint status details
+ *       404:
+ *         description: Complaint not found
+ */
+router.get('/complaints/ticket/:complaintId', trackComplaint);
 
 // Admin Routes
 /**
