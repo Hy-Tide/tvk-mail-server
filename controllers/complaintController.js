@@ -44,6 +44,9 @@ const sendComplaintEmails = async (complaint) => {
         <p><strong>Category:</strong> ${complaint.category}</p>
         <p><strong>Description:</strong> ${complaint.description}</p>
         <br>
+        <p>You can track the status of your complaint by visiting:</p>
+        <p><a href="${'https://tvkmaduravoyal153.com'}/complaint-status?id=${complaint.complaintId}">Track Complaint Status</a></p>
+        <br>
         <p>Thank you,</p>
         <p>TVK Complaints Team</p>
       `
@@ -57,7 +60,7 @@ const createComplaint = async (req, res) => {
   try {
     const complaint = new Complaint(req.body);
     const createdComplaint = await complaint.save();
-    
+
     // Trigger emails asynchronously (don't block the response)
     sendComplaintEmails(createdComplaint);
 
@@ -79,7 +82,7 @@ const getComplaints = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, status } = req.query;
     const query = { deletedAt: { $exists: false } };
-    
+
     if (status) query.status = status;
     if (search) {
       query.$or = [
@@ -125,7 +128,7 @@ const updateComplaintStatus = async (req, res) => {
   try {
     const { status, description } = req.body;
     const complaint = await Complaint.findOne({ _id: req.params.id, deletedAt: { $exists: false } });
-    
+
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
@@ -171,13 +174,13 @@ const deleteComplaint = async (req, res) => {
 const trackComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
-    
+
     // Find complaint by its readable ID (e.g., TVK-2026-00001)
-    const complaint = await Complaint.findOne({ 
-      complaintId: new RegExp(`^${complaintId}$`, 'i'), 
-      deletedAt: { $exists: false } 
+    const complaint = await Complaint.findOne({
+      complaintId: new RegExp(`^${complaintId}$`, 'i'),
+      deletedAt: { $exists: false }
     });
-    
+
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
