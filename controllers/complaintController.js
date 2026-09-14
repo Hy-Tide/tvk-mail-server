@@ -23,12 +23,14 @@ const sendComplaintEmails = async (complaint) => {
         <h3>New Complaint Received</h3>
         <p><strong>Complaint ID:</strong> ${complaint.complaintId}</p>
         <p><strong>Name:</strong> ${complaint.name}</p>
+        <p><strong>Voter ID:</strong> ${complaint.voterId}</p>
         <p><strong>Mobile:</strong> ${complaint.mobile}</p>
         <p><strong>Email:</strong> ${complaint.email}</p>
         <p><strong>Category:</strong> ${complaint.category}</p>
         <p><strong>Location:</strong> ${complaint.location} (${complaint.address})</p>
         <p><strong>Description:</strong></p>
         <p>${complaint.description}</p>
+        ${complaint.documentUrl ? `<p><strong>Attachment:</strong> <a href="${process.env.BACKEND_URL || 'http://localhost:5000'}${complaint.documentUrl}">View Image</a></p>` : ''}
       `
     });
 
@@ -58,7 +60,12 @@ const sendComplaintEmails = async (complaint) => {
 
 const createComplaint = async (req, res) => {
   try {
-    const complaint = new Complaint(req.body);
+    const complaintData = { ...req.body };
+    if (req.file) {
+      complaintData.documentUrl = `/uploads/${req.file.filename}`;
+    }
+
+    const complaint = new Complaint(complaintData);
     const createdComplaint = await complaint.save();
 
     // Trigger emails asynchronously (don't block the response)

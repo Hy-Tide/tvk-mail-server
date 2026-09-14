@@ -9,6 +9,8 @@ const complaintSchema = new mongoose.Schema({
   description: { type: String, required: true },
   location: { type: String, required: true },
   address: { type: String, required: true },
+  voterId: { type: String, required: true },
+  documentUrl: { type: String },
   status: { 
     type: String, 
     enum: ['Pending', 'In Progress', 'Resolved', 'Rejected'], 

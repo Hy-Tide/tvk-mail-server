@@ -1,6 +1,7 @@
 const express = require('express');
 const { createComplaint, getComplaints, getComplaintById, updateComplaintStatus, deleteComplaint, trackComplaint } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
+const { upload } = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ const router = express.Router();
  *       201:
  *         description: Complaint submitted
  */
-router.post('/complaints', createComplaint);
+router.post('/complaints', upload.single('documentUrl'), createComplaint);
 
 // Public Route for Tracking
 /**
